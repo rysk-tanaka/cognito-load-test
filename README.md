@@ -98,14 +98,14 @@ from cognito_load_test.config import LoadTestConfig
 config = LoadTestConfig(use_mock=False)
 load_test = CognitoLoadTest(total_requests=120, duration_seconds=1, config=config)
 results = load_test.run_test()
-```
-
-```python
-from cognito_load_test.load_test import CognitoLoadTest
-from cognito_load_test.config import LoadTestConfig
 
 # USER_SRP_AUTH を使用した実環境テスト
 config = LoadTestConfig(use_mock=False, auth_flow="USER_SRP_AUTH")
+load_test = CognitoLoadTest(config=config)
+results = load_test.run_test()
+
+# 特定のユーザーで認証テスト
+config = LoadTestConfig(use_mock=False, auth_flow="USER_SRP_AUTH", username="hoge", password="fuga")
 load_test = CognitoLoadTest(config=config)
 results = load_test.run_test()
 ```
@@ -123,6 +123,8 @@ results = load_test.run_test()
 - `use_mock`: モックの使用有無（デフォルト: True）
 - `aws_region`: AWSリージョン（デフォルト: "us-east-1"）
 - `auth_flow`: 認証フロー（"USER_PASSWORD_AUTH" または "USER_SRP_AUTH"）（デフォルト: "USER_PASSWORD_AUTH"）
+- `username`: 認証に使用するユーザー名（デフォルト: None、指定がない場合はランダム生成）
+- `password`: 認証に使用するパスワード（デフォルト: None、指定がない場合はランダム生成）
 
 ### 環境変数による設定
 
@@ -131,11 +133,15 @@ results = load_test.run_test()
 - `COGNITO_AUTH_FLOW`: 認証フロー（USER_PASSWORD_AUTH または USER_SRP_AUTH）
 - `COGNITO_USER_POOL_ID`: 実環境テスト用のユーザープールID
 - `COGNITO_CLIENT_ID`: 実環境テスト用のクライアントID
+- `COGNITO_USERNAME`: 認証に使用するユーザー名
+- `COGNITO_PASSWORD`: 認証に使用するパスワード
 
 ### 注意事項
 
 - モックテスト時は自動的に `USER_PASSWORD_AUTH` が使用されます
 - `USER_SRP_AUTH` は実環境テスト時のみ有効です
+- ユーザー名とパスワードが指定されない場合は、ランダムな値が生成されます
+- 実環境テストで特定のユーザーを使用する場合、そのユーザーが Cognito ユーザープールに存在している必要があります
 
 ## プロジェクト構造
 

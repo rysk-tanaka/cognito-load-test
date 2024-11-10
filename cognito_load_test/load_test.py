@@ -20,8 +20,8 @@ class CognitoLoadTest:
 
     def perform_auth_request(self, client, user_pool_id, client_id):
         """認証リクエストを実行"""
-        username = utils.random_string(10)
-        password = utils.random_string(12)
+        username = self.config.username or utils.random_string(10)
+        password = self.config.password or utils.random_string(12)
         try:
             if self.config.use_mock or self.config.auth_flow == "USER_PASSWORD_AUTH":
                 client.initiate_auth(
