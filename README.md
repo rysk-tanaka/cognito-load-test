@@ -13,7 +13,7 @@ AWS Cognitoの`initiate_auth`に対する負荷テストツール。
 
 1. リポジトリのクローン：
 ```bash
-git clone https://github.com/yourusername/cognito-load-test.git
+git clone https://github.com/rysk-tanaka/cognito-load-test.git
 cd cognito-load-test
 ```
 
