@@ -4,6 +4,7 @@ from concurrent.futures import ThreadPoolExecutor
 
 import boto3
 from moto import mock_aws
+from warrant_lite import WarrantLite as AWSSRP
 
 from cognito_load_test.config import LoadTestConfig
 from cognito_load_test.utils import create_user_pool_and_client, random_string
@@ -19,16 +20,36 @@ class CognitoLoadTest:
 
     def perform_auth_request(self, client, user_pool_id, client_id):
         """認証リクエストを実行"""
+        username = random_string(10)
+        password = random_string(12)
         try:
-            client.initiate_auth(
-                AuthFlow="USER_PASSWORD_AUTH",
-                ClientId=client_id,
-                AuthParameters={
-                    "USERNAME": random_string(10),
-                    "PASSWORD": random_string(12),
-                },
-            )
-            return True
+            if self.config.use_mock or self.config.auth_flow == "USER_PASSWORD_AUTH":
+                client.initiate_auth(
+                    AuthFlow="USER_PASSWORD_AUTH",
+                    ClientId=client_id,
+                    AuthParameters={
+                        "USERNAME": username,
+                        "PASSWORD": password,
+                    },
+                )
+            else:
+                aws = AWSSRP(
+                    username=username,
+                    password=password,
+                    pool_id=user_pool_id,
+                    client_id=client_id,
+                    client=client,
+                )
+                srp_a = aws.get_auth_params()["SRP_A"]
+                client.initiate_auth(
+                    AuthFlow="USER_SRP_AUTH",
+                    ClientId=client_id,
+                    AuthParameters={
+                        "USERNAME": username,
+                        "SRP_A": srp_a,
+                    },
+                )
+                return True
         except Exception as e:
             print(f"Error: {e}")
             return False
