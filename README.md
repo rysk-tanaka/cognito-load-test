@@ -28,7 +28,7 @@ source .venv/bin/activate
 
 3. 開発用依存関係のインストール：
 ```bash
-uv pip install -e ".[test]"
+uv pip install -e ".[dev]"
 ```
 
 ### 開発用コマンド
