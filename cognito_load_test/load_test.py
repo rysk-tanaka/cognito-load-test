@@ -1,18 +1,21 @@
 import time
+import os
 from concurrent.futures import ThreadPoolExecutor
 
 import boto3
 from moto import mock_aws
 
+from cognito_load_test.config import LoadTestConfig
 from cognito_load_test.utils import create_user_pool_and_client, random_string
 
 
 class CognitoLoadTest:
-    def __init__(self, total_requests=120, duration_seconds=1):
+    def __init__(self, total_requests=120, duration_seconds=1, config=None):
         self.total_requests = total_requests
         self.duration_seconds = duration_seconds
         self.successful_requests = 0
         self.failed_requests = 0
+        self.config = config or LoadTestConfig.from_env()
 
     def perform_auth_request(self, client, user_pool_id, client_id):
         """認証リクエストを実行"""
@@ -31,10 +34,35 @@ class CognitoLoadTest:
             return False
 
     @mock_aws
+    def run_test_with_mock(self):
+        """モックを使用したテストを実行"""
+        return self._execute_test()
+
+    def run_test_without_mock(self):
+        """実環境に対してテストを実行"""
+        if not all([os.getenv("COGNITO_USER_POOL_ID"), os.getenv("COGNITO_CLIENT_ID")]):
+            raise ValueError(
+                "Real environment requires COGNITO_USER_POOL_ID and COGNITO_CLIENT_ID"
+            )
+        return self._execute_test()
+
     def run_test(self):
-        """負荷テストの実行"""
-        cognito_client = boto3.client("cognito-idp", region_name="us-east-1")
-        user_pool_id, client_id = create_user_pool_and_client(cognito_client)
+        """設定に基づいてテストを実行"""
+        if self.config.use_mock:
+            return self.run_test_with_mock()
+        else:
+            return self.run_test_without_mock()
+
+    def _execute_test(self):
+        """テストの実際の実行ロジック"""
+        cognito_client = boto3.client("cognito-idp", region_name=self.config.aws_region)
+
+        # ユーザープールとクライアントIDの取得
+        if self.config.use_mock:
+            user_pool_id, client_id = create_user_pool_and_client(cognito_client)
+        else:
+            user_pool_id = os.getenv("COGNITO_USER_POOL_ID")
+            client_id = os.getenv("COGNITO_CLIENT_ID")
 
         start_time = time.time()
 
@@ -65,4 +93,5 @@ class CognitoLoadTest:
             "failed_requests": self.failed_requests,
             "duration": duration,
             "requests_per_second": self.total_requests / duration,
+            "used_mock": self.config.use_mock,
         }
