@@ -17,6 +17,7 @@ dev = ["ruff>=0.1.9", "pytest>=7.0.0", "pytest-cov>=4.0.0"]
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 python_files = ["test_*.py"]
+filterwarnings = ["ignore::DeprecationWarning:botocore.*:"]
 
 [tool.lint.ruff]
 select = ["E", "F", "I"]
