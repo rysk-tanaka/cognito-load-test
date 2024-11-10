@@ -1,7 +1,19 @@
 [project]
 name = "cognito-load-test"
 version = "0.1.0"
-description = "Add your description here"
+description = "Cognito Load Testing Tool"
 readme = "README.md"
-requires-python = ">=3.12"
-dependencies = []
+requires-python = ">=3.8"
+dependencies = ["boto3>=1.26.0", "moto>=4.0.0"]
+
+[project.optional-dependencies]
+test = ["pytest>=7.0.0", "pytest-cov>=4.0.0"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+
+[tool.ruff]
+select = ["E", "F", "I"]
+ignore = []
+line-length = 100
