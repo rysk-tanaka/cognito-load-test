@@ -6,8 +6,8 @@ import boto3
 from moto import mock_aws
 from warrant_lite import WarrantLite as AWSSRP
 
+from cognito_load_test import utils
 from cognito_load_test.config import LoadTestConfig
-from cognito_load_test.utils import create_user_pool_and_client, random_string
 
 
 class CognitoLoadTest:
@@ -20,8 +20,8 @@ class CognitoLoadTest:
 
     def perform_auth_request(self, client, user_pool_id, client_id):
         """認証リクエストを実行"""
-        username = random_string(10)
-        password = random_string(12)
+        username = utils.random_string(10)
+        password = utils.random_string(12)
         try:
             if self.config.use_mock or self.config.auth_flow == "USER_PASSWORD_AUTH":
                 client.initiate_auth(
@@ -80,7 +80,7 @@ class CognitoLoadTest:
 
         # ユーザープールとクライアントIDの取得
         if self.config.use_mock:
-            user_pool_id, client_id = create_user_pool_and_client(cognito_client)
+            user_pool_id, client_id = utils.create_user_pool_and_client(cognito_client)
         else:
             user_pool_id = os.getenv("COGNITO_USER_POOL_ID")
             client_id = os.getenv("COGNITO_CLIENT_ID")
