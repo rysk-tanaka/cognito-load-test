@@ -25,7 +25,7 @@ class CognitoLoadTest:
         """認証情報を取得。初回のみ生成し、以降は同じ値を使用"""
         if not self._username:
             self._username = self.config.username or utils.random_string(10)
-            self._password = self.config.password or utils.random_string(12)
+            self._password = self.config.password or utils.generate_valid_password()
         return self._username, self._password
 
     def perform_auth_request(self, client, user_pool_id, client_id):

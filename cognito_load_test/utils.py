@@ -7,6 +7,30 @@ def random_string(length: int) -> str:
     return "".join(random.choices(string.ascii_letters + string.digits, k=length))
 
 
+def generate_valid_password(length=12):
+    """Cognitoのパスワードポリシーに準拠したパスワードを生成"""
+    # 各文字種から最低1文字を確保
+    lowercase = random.choice(string.ascii_lowercase)
+    uppercase = random.choice(string.ascii_uppercase)
+    number = random.choice(string.digits)
+    special = random.choice("!@#$%^&*()_+-=[]{}|'")
+
+    # 残りの長さをランダムに埋める
+    remaining_length = length - 4  # 確定した4文字を引く
+    remaining_chars = "".join(
+        random.choices(
+            string.ascii_letters + string.digits + "!@#$%^&*()_+-=[]{}|'",
+            k=remaining_length,
+        )
+    )
+
+    # すべての文字を結合してシャッフル
+    all_chars = list(lowercase + uppercase + number + special + remaining_chars)
+    random.shuffle(all_chars)
+
+    return "".join(all_chars)
+
+
 def create_user_pool_and_client(cognito_client):
     """ユーザープールとクライアントを作成"""
     # ユーザープールの作成
