@@ -123,6 +123,7 @@ cognito-load-test/
 ├── cognito_load_test/   # ソースコード
 │   ├── __init__.py
 │   ├── load_test.py    # メインの負荷テストロジック
+│   ├── config.py       # 設定管理
 │   └── utils.py        # ユーティリティ関数
 └── tests/               # テストコード
     ├── __init__.py
