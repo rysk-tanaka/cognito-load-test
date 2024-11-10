@@ -56,7 +56,8 @@ cognito-load-test --output-format json
   "failed_requests": 0,
   "duration": 1.23,
   "requests_per_second": 97.56,
-  "used_mock": true
+  "used_mock": true,
+  "username": "NwleiCQHsX"
 }
 ```
 
@@ -226,5 +227,7 @@ cognito-load-test/
 
 - モックテスト時は自動的に `USER_PASSWORD_AUTH` が使用されます
 - `USER_SRP_AUTH` は実環境テスト時のみ有効です
-- ユーザー名とパスワードが指定されない場合は、ランダムな値が生成されます
+- 1回のテスト実行内では、同じ認証情報が再利用されます
+  - 設定ファイルまたは環境変数で指定された認証情報を使用
+  - 指定がない場合は、初回実行時にランダム生成された値を使用
 - 実環境テストで特定のユーザーを使用する場合、そのユーザーが Cognito ユーザープールに存在している必要があります

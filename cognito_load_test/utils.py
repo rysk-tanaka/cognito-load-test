@@ -20,3 +20,26 @@ def create_user_pool_and_client(cognito_client):
     )
 
     return user_pool["UserPool"]["Id"], client["UserPoolClient"]["ClientId"]
+
+
+def create_test_user(cognito_client, user_pool_id, username, password):
+    """テスト用ユーザーを作成"""
+    try:
+        cognito_client.admin_create_user(
+            UserPoolId=user_pool_id,
+            Username=username,
+            TemporaryPassword=password,
+            MessageAction="SUPPRESS",
+        )
+
+        # パスワードを確定
+        cognito_client.admin_set_user_password(
+            UserPoolId=user_pool_id,
+            Username=username,
+            Password=password,
+            Permanent=True,
+        )
+        return True
+    except Exception as e:
+        print(f"Error creating user: {e}")
+        return False

@@ -17,11 +17,20 @@ class CognitoLoadTest:
         self.successful_requests = 0
         self.failed_requests = 0
         self.config = config or LoadTestConfig.from_env()
+        # 認証情報を保持
+        self._username = None
+        self._password = None
+
+    def _get_auth_credentials(self):
+        """認証情報を取得。初回のみ生成し、以降は同じ値を使用"""
+        if not self._username:
+            self._username = self.config.username or utils.random_string(10)
+            self._password = self.config.password or utils.random_string(12)
+        return self._username, self._password
 
     def perform_auth_request(self, client, user_pool_id, client_id):
         """認証リクエストを実行"""
-        username = self.config.username or utils.random_string(10)
-        password = self.config.password or utils.random_string(12)
+        username, password = self._get_auth_credentials()
         try:
             if self.config.use_mock or self.config.auth_flow == "USER_PASSWORD_AUTH":
                 client.initiate_auth(
@@ -81,6 +90,9 @@ class CognitoLoadTest:
         # ユーザープールとクライアントIDの取得
         if self.config.use_mock:
             user_pool_id, client_id = utils.create_user_pool_and_client(cognito_client)
+            # モックテスト用のユーザーを作成
+            username, password = self._get_auth_credentials()
+            utils.create_test_user(cognito_client, user_pool_id, username, password)
         else:
             user_pool_id = os.getenv("COGNITO_USER_POOL_ID")
             client_id = os.getenv("COGNITO_CLIENT_ID")
@@ -115,4 +127,5 @@ class CognitoLoadTest:
             "duration": duration,
             "requests_per_second": self.total_requests / duration,
             "used_mock": self.config.use_mock,
+            "username": self._username,
         }
