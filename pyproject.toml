@@ -15,6 +15,9 @@ dependencies = [
 [project.optional-dependencies]
 dev = ["ruff>=0.1.9", "pytest>=7.0.0", "pytest-cov>=4.0.0"]
 
+[project.scripts]
+cognito-load-test = "cognito_load_test.cli:main"
+
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 python_files = ["test_*.py"]

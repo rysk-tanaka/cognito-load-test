@@ -143,6 +143,54 @@ results = load_test.run_test()
 - ユーザー名とパスワードが指定されない場合は、ランダムな値が生成されます
 - 実環境テストで特定のユーザーを使用する場合、そのユーザーが Cognito ユーザープールに存在している必要があります
 
+## CLI の使用方法
+
+インストール後、`cognito-load-test`コマンドが使用可能になります：
+
+### 基本的な使用方法
+
+```bash
+# モック環境でのテスト
+cognito-load-test --total-requests 100
+
+# 実環境でのテスト
+cognito-load-test \
+    --use-mock false \
+    --auth-flow USER_SRP_AUTH \
+    --username testuser \
+    --password testpass \
+    --total-requests 50
+
+# JSON形式での出力
+cognito-load-test --output-format json
+```
+
+### オプション
+
+```
+--total-requests    実行する総リクエスト数（デフォルト: 120）
+--duration-seconds  目標実行時間（秒）（デフォルト: 1）
+--use-mock         モック環境の使用（true/false、デフォルト: true）
+--region           AWSリージョン（デフォルト: us-east-1）
+--auth-flow        認証フロー（USER_PASSWORD_AUTH/USER_SRP_AUTH）
+--username         認証用ユーザー名（オプション）
+--password         認証用パスワード（オプション）
+--output-format    出力形式（json/text、デフォルト: text）
+```
+
+### 環境変数との併用
+
+CLIオプションは環境変数と併用できます。CLIオプションが優先されます：
+
+```bash
+# 環境変数を設定
+export COGNITO_USER_POOL_ID=your-pool-id
+export COGNITO_CLIENT_ID=your-client-id
+
+# CLIで実行
+cognito-load-test --use-mock false
+```
+
 ## プロジェクト構造
 
 ```
@@ -153,6 +201,7 @@ cognito-load-test/
 │   ├── __init__.py
 │   ├── load_test.py    # メインの負荷テストロジック
 │   ├── config.py       # 設定管理
+│   ├── cli.py          # CLIインターフェース
 │   └── utils.py        # ユーティリティ関数
 └── tests/               # テストコード
     ├── __init__.py
