@@ -1,5 +1,6 @@
 import time
 import os
+import logging
 from concurrent.futures import ThreadPoolExecutor
 
 import boto3
@@ -8,6 +9,8 @@ from warrant_lite import WarrantLite as AWSSRP
 
 from cognito_load_test import utils
 from cognito_load_test.config import LoadTestConfig
+
+logger = logging.getLogger(__name__)
 
 
 class CognitoLoadTest:
@@ -33,7 +36,7 @@ class CognitoLoadTest:
         username, password = self._get_auth_credentials()
         try:
             if self.config.use_mock or self.config.auth_flow == "USER_PASSWORD_AUTH":
-                client.initiate_auth(
+                response = client.initiate_auth(
                     AuthFlow="USER_PASSWORD_AUTH",
                     ClientId=client_id,
                     AuthParameters={
@@ -50,7 +53,7 @@ class CognitoLoadTest:
                     client=client,
                 )
                 srp_a = aws.get_auth_params()["SRP_A"]
-                client.initiate_auth(
+                response = client.initiate_auth(
                     AuthFlow="USER_SRP_AUTH",
                     ClientId=client_id,
                     AuthParameters={
@@ -58,9 +61,13 @@ class CognitoLoadTest:
                         "SRP_A": srp_a,
                     },
                 )
+            # レスポンスの検証
+            if "AuthenticationResult" in response:
                 return True
+            logger.error(f"Unexpected response format: {response}")
+            return False
         except Exception as e:
-            print(f"Error: {e}")
+            logger.error(f"Error: {e}")
             return False
 
     @mock_aws
@@ -112,9 +119,14 @@ class CognitoLoadTest:
                 )
 
             for future in futures:
-                if future.result():
-                    self.successful_requests += 1
-                else:
+                try:
+                    result = future.result(timeout=10)
+                    if result:
+                        self.successful_requests += 1
+                    else:
+                        self.failed_requests += 1
+                except Exception as e:
+                    logger.error(f"Future error: {str(e)}", exc_info=True)
                     self.failed_requests += 1
 
         end_time = time.time()

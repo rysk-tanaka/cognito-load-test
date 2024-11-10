@@ -1,5 +1,7 @@
 import argparse
 import json
+import logging
+import os
 
 from cognito_load_test.config import LoadTestConfig
 from cognito_load_test.load_test import CognitoLoadTest
@@ -51,6 +53,11 @@ def parse_args():
 
 
 def main():
+    # ログ設定
+    logging.basicConfig(
+        level=logging.DEBUG if os.getenv("DEBUG") else logging.INFO,
+        format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+    )
     args = parse_args()
 
     config = LoadTestConfig(
