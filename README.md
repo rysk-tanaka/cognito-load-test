@@ -86,11 +86,10 @@ print(f"Requests per Second: {results['requests_per_second']:.2f}")
 cognito-load-test/
 ├── pyproject.toml        # プロジェクト設定とビルド設定
 ├── README.md            # このファイル
-├── src/                 # ソースコード
-│   └── cognito_load_test/
-│       ├── __init__.py
-│       ├── load_test.py # メインの負荷テストロジック
-│       └── utils.py     # ユーティリティ関数
+├── cognito_load_test/   # ソースコード
+│   ├── __init__.py
+│   ├── load_test.py    # メインの負荷テストロジック
+│   └── utils.py        # ユーティリティ関数
 └── tests/               # テストコード
     ├── __init__.py
     └── test_load_test.py

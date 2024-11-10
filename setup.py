@@ -4,8 +4,8 @@ setup(
     name="cognito-load-test",
     packages=find_packages(
         include=[
-            "src",
-            "src.*",
+            "cognito_load_test",
+            "cognito_load_test.*",
         ]
     ),
 )
