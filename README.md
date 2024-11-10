@@ -3,7 +3,15 @@
 AWS Cognitoの`initiate_auth`に対する負荷テストツール。
 モックと実環境の両方でテストが可能です。
 
-## 開発環境のセットアップ
+## 目次
+
+- [インストール](#インストール)
+- [CLIの使用方法](#cli-の使用方法)
+- [Python APIの使用方法](#python-apiの使用方法)
+- [設定オプション](#設定オプション)
+- [開発者向け情報](#開発者向け情報)
+
+## インストール
 
 ### 前提条件
 
@@ -11,54 +19,74 @@ AWS Cognitoの`initiate_auth`に対する負荷テストツール。
 - uv
 - AWS認証情報（実環境テスト時のみ必要）
 
-### セットアップ手順
-
-1. リポジトリのクローン：
-```bash
-git clone https://github.com/rysk-tanaka/cognito-load-test.git
-cd cognito-load-test
-```
-
-2. 仮想環境の作成と有効化：
-```bash
-uv venv
-# Unixの場合
-source .venv/bin/activate
-# Windowsの場合
-# .venv\Scripts\activate
-```
-
-3. 開発用依存関係のインストール：
-```bash
-uv pip install -e ".[dev]"
-```
-
-### 開発用コマンド
-
-- テストの実行：
-```bash
-pytest
-```
-
-- コードフォーマット：
-```bash
-ruff format .
-```
-
-- リンター実行：
-```bash
-ruff check .
-```
-
-## インストール
-
-プロジェクトを使用するだけの場合：
+### インストール手順
 
 ```bash
 uv pip install .
 ```
 
-## 使用方法
+## CLI の使用方法
+
+インストール後、`cognito-load-test`コマンドが使用可能になります：
+
+### 基本的な使用方法
+
+```bash
+# モック環境でのテスト
+cognito-load-test --total-requests 100
+
+# 実環境でのテスト
+cognito-load-test \
+    --use-mock false \
+    --auth-flow USER_SRP_AUTH \
+    --username testuser \
+    --password testpass \
+    --total-requests 50
+
+# JSON形式での出力
+cognito-load-test --output-format json
+```
+
+### 実行結果例
+
+```json
+{
+  "total_requests": 120,
+  "successful_requests": 120,
+  "failed_requests": 0,
+  "duration": 1.23,
+  "requests_per_second": 97.56,
+  "used_mock": true
+}
+```
+
+### オプション
+
+```
+--total-requests    実行する総リクエスト数（デフォルト: 120）
+--duration-seconds  目標実行時間（秒）（デフォルト: 1）
+--use-mock         モック環境の使用（true/false、デフォルト: true）
+--region           AWSリージョン（デフォルト: us-east-1）
+--auth-flow        認証フロー（USER_PASSWORD_AUTH/USER_SRP_AUTH）
+--username         認証用ユーザー名（オプション）
+--password         認証用パスワード（オプション）
+--output-format    出力形式（json/text、デフォルト: text）
+```
+
+### 環境変数との併用
+
+CLIオプションは環境変数と併用できます。CLIオプションが優先されます：
+
+```bash
+# 環境変数を設定
+export COGNITO_USER_POOL_ID=your-pool-id
+export COGNITO_CLIENT_ID=your-client-id
+
+# CLIで実行
+cognito-load-test --use-mock false
+```
+
+## Python APIの使用方法
 
 ### モックを使用したテスト
 
@@ -136,59 +164,45 @@ results = load_test.run_test()
 - `COGNITO_USERNAME`: 認証に使用するユーザー名
 - `COGNITO_PASSWORD`: 認証に使用するパスワード
 
-### 注意事項
+## 開発者向け情報
 
-- モックテスト時は自動的に `USER_PASSWORD_AUTH` が使用されます
-- `USER_SRP_AUTH` は実環境テスト時のみ有効です
-- ユーザー名とパスワードが指定されない場合は、ランダムな値が生成されます
-- 実環境テストで特定のユーザーを使用する場合、そのユーザーが Cognito ユーザープールに存在している必要があります
+### 開発環境のセットアップ
 
-## CLI の使用方法
-
-インストール後、`cognito-load-test`コマンドが使用可能になります：
-
-### 基本的な使用方法
-
+1. リポジトリのクローン：
 ```bash
-# モック環境でのテスト
-cognito-load-test --total-requests 100
-
-# 実環境でのテスト
-cognito-load-test \
-    --use-mock false \
-    --auth-flow USER_SRP_AUTH \
-    --username testuser \
-    --password testpass \
-    --total-requests 50
-
-# JSON形式での出力
-cognito-load-test --output-format json
+git clone https://github.com/rysk-tanaka/cognito-load-test.git
+cd cognito-load-test
 ```
 
-### オプション
-
-```
---total-requests    実行する総リクエスト数（デフォルト: 120）
---duration-seconds  目標実行時間（秒）（デフォルト: 1）
---use-mock         モック環境の使用（true/false、デフォルト: true）
---region           AWSリージョン（デフォルト: us-east-1）
---auth-flow        認証フロー（USER_PASSWORD_AUTH/USER_SRP_AUTH）
---username         認証用ユーザー名（オプション）
---password         認証用パスワード（オプション）
---output-format    出力形式（json/text、デフォルト: text）
-```
-
-### 環境変数との併用
-
-CLIオプションは環境変数と併用できます。CLIオプションが優先されます：
-
+2. 仮想環境の作成と有効化：
 ```bash
-# 環境変数を設定
-export COGNITO_USER_POOL_ID=your-pool-id
-export COGNITO_CLIENT_ID=your-client-id
+uv venv
+# Unixの場合
+source .venv/bin/activate
+# Windowsの場合
+# .venv\Scripts\activate
+```
 
-# CLIで実行
-cognito-load-test --use-mock false
+3. 開発用依存関係のインストール：
+```bash
+uv pip install -e ".[dev]"
+```
+
+### 開発用コマンド
+
+- テストの実行：
+```bash
+pytest
+```
+
+- コードフォーマット：
+```bash
+ruff format .
+```
+
+- リンター実行：
+```bash
+ruff check .
 ```
 
 ## プロジェクト構造
@@ -207,3 +221,10 @@ cognito-load-test/
     ├── __init__.py
     └── test_load_test.py
 ```
+
+### 注意事項
+
+- モックテスト時は自動的に `USER_PASSWORD_AUTH` が使用されます
+- `USER_SRP_AUTH` は実環境テスト時のみ有効です
+- ユーザー名とパスワードが指定されない場合は、ランダムな値が生成されます
+- 実環境テストで特定のユーザーを使用する場合、そのユーザーが Cognito ユーザープールに存在している必要があります
