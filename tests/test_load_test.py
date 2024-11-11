@@ -45,6 +45,10 @@ def test_load_test_without_mock():
     assert results["used_mock"] is False
 
 
+@pytest.mark.skipif(
+    "os.getenv('COGNITO_USER_POOL_ID') is not None or os.getenv('COGNITO_CLIENT_ID') is not None",
+    reason="Environment variables are set - test should run only without credentials",
+)
 def test_load_test_without_mock_raises_error():
     config = LoadTestConfig(use_mock=False)
     load_test = CognitoLoadTest(config=config)
