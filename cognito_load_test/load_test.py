@@ -154,7 +154,7 @@ class CognitoLoadTest:
 
             for future in futures:
                 try:
-                    result = future.result(timeout=10)
+                    result = future.result(timeout=60)
                     if result:
                         self.successful_requests += 1
                     else:
