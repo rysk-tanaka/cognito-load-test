@@ -32,16 +32,11 @@ def parse_args():
         help="Use mock environment (default: true)",
     )
     parser.add_argument(
-        "--region", default="us-east-1", help="AWS region (default: us-east-1)"
-    )
-    parser.add_argument(
         "--auth-flow",
         choices=["USER_PASSWORD_AUTH", "USER_SRP_AUTH"],
         default="USER_PASSWORD_AUTH",
         help="Authentication flow to use (default: USER_PASSWORD_AUTH)",
     )
-    parser.add_argument("--username", help="Username for authentication (optional)")
-    parser.add_argument("--password", help="Password for authentication (optional)")
     parser.add_argument(
         "--output-format",
         choices=["json", "text"],
@@ -60,13 +55,10 @@ def main():
     )
     args = parse_args()
 
-    config = LoadTestConfig(
-        use_mock=args.use_mock,
-        aws_region=args.region,
-        auth_flow=args.auth_flow,
-        username=args.username,
-        password=args.password,
-    )
+    # 環境変数から設定を読み込み、CLIオプションで上書き
+    config = LoadTestConfig.from_env()
+    config.use_mock = args.use_mock
+    config.auth_flow = args.auth_flow
 
     load_test = CognitoLoadTest(
         total_requests=args.total_requests,

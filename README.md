@@ -36,12 +36,12 @@ uv pip install .
 cognito-load-test --total-requests 100
 
 # 実環境でのテスト
-cognito-load-test \
-    --use-mock false \
-    --auth-flow USER_SRP_AUTH \
-    --username testuser \
-    --password testpass \
-    --total-requests 50
+export COGNITO_USER_POOL_ID=your-pool-id
+export COGNITO_CLIENT_ID=your-client-id
+export COGNITO_USERNAME=testuser
+export COGNITO_PASSWORD=testpass
+
+cognito-load-test --use-mock false --auth-flow USER_SRP_AUTH --total-requests 50
 
 # JSON形式での出力
 cognito-load-test --output-format json
@@ -67,24 +67,25 @@ cognito-load-test --output-format json
 --total-requests    実行する総リクエスト数（デフォルト: 120）
 --duration-seconds  目標実行時間（秒）（デフォルト: 1）
 --use-mock         モック環境の使用（true/false、デフォルト: true）
---region           AWSリージョン（デフォルト: us-east-1）
 --auth-flow        認証フロー（USER_PASSWORD_AUTH/USER_SRP_AUTH）
---username         認証用ユーザー名（オプション）
---password         認証用パスワード（オプション）
 --output-format    出力形式（json/text、デフォルト: text）
 ```
 
-### 環境変数との併用
+### 環境変数による設定
 
-CLIオプションは環境変数と併用できます。CLIオプションが優先されます：
+設定は以下の環境変数で行います：
 
 ```bash
-# 環境変数を設定
+# 必須（実環境テスト時）
 export COGNITO_USER_POOL_ID=your-pool-id
 export COGNITO_CLIENT_ID=your-client-id
 
-# CLIで実行
-cognito-load-test --use-mock false
+# オプション
+export COGNITO_USERNAME=your-username      # 指定しない場合はランダム生成
+export COGNITO_PASSWORD=your-password      # 指定しない場合はランダム生成
+export COGNITO_LOAD_TEST_USE_MOCK=false   # デフォルト: true
+export COGNITO_AUTH_FLOW=USER_SRP_AUTH    # デフォルト: USER_PASSWORD_AUTH
+export AWS_REGION=us-east-1               # デフォルト: us-east-1
 ```
 
 ## Python APIの使用方法
