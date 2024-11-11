@@ -85,6 +85,7 @@ def main():
         print(f"Duration: {results['duration']:.2f} seconds")
         print(f"Requests per Second: {results['requests_per_second']:.2f}")
         print(f"Used Mock: {results['used_mock']}")
+        print(f"Username: {results['username']}")
 
 
 if __name__ == "__main__":
