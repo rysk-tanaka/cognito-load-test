@@ -57,6 +57,7 @@ cognito-load-test --output-format json
   "duration": 1.23,
   "requests_per_second": 97.56,
   "used_mock": true,
+  "retry_mode": "standard",
   "username": "NwleiCQHsX"
 }
 ```
@@ -68,6 +69,7 @@ cognito-load-test --output-format json
 --duration-seconds  目標実行時間（秒）（デフォルト: 1）
 --use-mock         モック環境の使用（true/false、デフォルト: true）
 --auth-flow        認証フロー（USER_PASSWORD_AUTH/USER_SRP_AUTH）
+--retry-mode       Boto3のリトライモード（standard/adaptive、デフォルト: standard）
 --output-format    出力形式（json/text、デフォルト: text）
 ```
 
@@ -85,6 +87,7 @@ export COGNITO_USERNAME=your-username      # 指定しない場合はランダ�
 export COGNITO_PASSWORD=your-password      # 指定しない場合はランダム生成
 export COGNITO_LOAD_TEST_USE_MOCK=false   # デフォルト: true
 export COGNITO_AUTH_FLOW=USER_SRP_AUTH    # デフォルト: USER_PASSWORD_AUTH
+export COGNITO_RETRY_MODE=standard        # デフォルト: standard
 export AWS_REGION=us-east-1               # デフォルト: us-east-1
 ```
 

@@ -38,6 +38,12 @@ def parse_args():
         help="Authentication flow to use (default: USER_PASSWORD_AUTH)",
     )
     parser.add_argument(
+        "--retry-mode",
+        choices=["standard", "adaptive"],
+        default="standard",
+        help="Boto3 retry mode (default: standard)",
+    )
+    parser.add_argument(
         "--output-format",
         choices=["json", "text"],
         default="text",
@@ -59,6 +65,7 @@ def main():
     config = LoadTestConfig.from_env()
     config.use_mock = args.use_mock
     config.auth_flow = args.auth_flow
+    config.retry_mode = args.retry_mode
 
     load_test = CognitoLoadTest(
         total_requests=args.total_requests,
@@ -77,6 +84,7 @@ def main():
         print(f"Duration: {results['duration']:.2f} seconds")
         print(f"Requests per Second: {results['requests_per_second']:.2f}")
         print(f"Used Mock: {results['used_mock']}")
+        print(f"Retry Mode: {results['retry_mode']}")
         print(f"Username: {results['username']}")
 
 

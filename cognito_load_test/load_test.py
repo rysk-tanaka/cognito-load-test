@@ -117,7 +117,7 @@ class CognitoLoadTest:
         boto3_config = Config(
             max_pool_connections=self.total_requests,
             retries={
-                "mode": "standard",
+                "mode": self.config.retry_mode,
                 "max_attempts": 5,
             },
         )
@@ -173,5 +173,6 @@ class CognitoLoadTest:
             "duration": duration,
             "requests_per_second": self.total_requests / duration,
             "used_mock": self.config.use_mock,
+            "retry_mode": self.config.retry_mode,
             "username": self._username,
         }
