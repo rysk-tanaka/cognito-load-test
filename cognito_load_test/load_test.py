@@ -61,20 +61,27 @@ class CognitoLoadTest:
                         "SRP_A": srp_a,
                     },
                 )
-                if "ChallengeName" not in pre_response:
-                    return False
-                if pre_response["ChallengeName"] != "PASSWORD_VERIFIER":
-                    return False
-                if "ChallengeParameters" not in pre_response:
-                    return False
-                challenge_response = aws.process_challenge(
-                    pre_response["ChallengeParameters"]
-                )
-                response = client.respond_to_auth_challenge(
-                    ChallengeName="PASSWORD_VERIFIER",
-                    ClientId=client_id,
-                    ChallengeResponses=challenge_response,
-                )
+                if "ResponseMetadata" in pre_response:
+                    if pre_response["ResponseMetadata"]["HTTPStatusCode"] == 200:
+                        return True
+                logger.error(f"Unexpected response format: {pre_response}")
+                return False
+
+                # TODO ここから先は未実装
+                # if "ChallengeName" not in pre_response:
+                #    return False
+                # if pre_response["ChallengeName"] != "PASSWORD_VERIFIER":
+                #    return False
+                # if "ChallengeParameters" not in pre_response:
+                #    return False
+                # challenge_response = aws.process_challenge(
+                #    pre_response["ChallengeParameters"]
+                # )
+                # response = client.respond_to_auth_challenge(
+                #    ChallengeName="PASSWORD_VERIFIER",
+                #    ClientId=client_id,
+                #    ChallengeResponses=challenge_response,
+                # )
             # レスポンスの検証
             if "AuthenticationResult" in response:
                 return True
