@@ -53,13 +53,27 @@ class CognitoLoadTest:
                     client=client,
                 )
                 srp_a = aws.get_auth_params()["SRP_A"]
-                response = client.initiate_auth(
+                pre_response = client.initiate_auth(
                     AuthFlow="USER_SRP_AUTH",
                     ClientId=client_id,
                     AuthParameters={
                         "USERNAME": username,
                         "SRP_A": srp_a,
                     },
+                )
+                if "ChallengeName" not in pre_response:
+                    return False
+                if pre_response["ChallengeName"] != "PASSWORD_VERIFIER":
+                    return False
+                if "ChallengeParameters" not in pre_response:
+                    return False
+                challenge_response = aws.process_challenge(
+                    pre_response["ChallengeParameters"]
+                )
+                response = client.respond_to_auth_challenge(
+                    ChallengeName="PASSWORD_VERIFIER",
+                    ClientId=client_id,
+                    ChallengeResponses=challenge_response,
                 )
             # レスポンスの検証
             if "AuthenticationResult" in response:
