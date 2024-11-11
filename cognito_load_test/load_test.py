@@ -4,6 +4,7 @@ import logging
 from concurrent.futures import ThreadPoolExecutor
 
 import boto3
+from botocore.config import Config
 from moto import mock_aws
 from warrant_lite import WarrantLite as AWSSRP
 
@@ -113,7 +114,19 @@ class CognitoLoadTest:
 
     def _execute_test(self):
         """テストの実際の実行ロジック"""
-        cognito_client = boto3.client("cognito-idp", region_name=self.config.aws_region)
+        boto3_config = Config(
+            max_pool_connections=self.total_requests,
+            retries={
+                "mode": "standard",
+                "max_attempts": 5,
+            },
+        )
+        session = boto3.Session()
+        cognito_client = session.client(
+            "cognito-idp",
+            region_name=self.config.aws_region,
+            config=boto3_config,
+        )
 
         # ユーザープールとクライアントIDの取得
         if self.config.use_mock:
